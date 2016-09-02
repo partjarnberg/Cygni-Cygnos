@@ -55,75 +55,27 @@
         var controllerOptions = { enableGestures: true };
 
         var sin = [T("sin"), T("pulse")];
+        var instruments1 = [T("sin"), T("pulse")];
+        var instruments2 = [T("sin"), T("pulse")];
+//        T("delay", {time: 50, fb: 1.4, mix: 0.5}, sin[0]).play();
+        var handPlayer1 = {counter: 0, instruments: instruments1};
+        var handPlayer2 = {counter: 0, instruments: instruments2};
+        var handPlayers = [handPlayer1, handPlayer2];
 
         Leap.loop(controllerOptions,
             function (frame) {
-                //Only accept one call every three seconds, to avoid flooding our poor little server
-                // if (new Date() - lastCall < 3000)
-                    // return;
-                    frame.hands.forEach(function(hand, i) {
-                        if (i < sin.length) {
-                            var position = hand.palmPosition;
-                            sin[i].freq = position[1] * 4;
-                            sin[i].play();
-                        }
-
-                    });
-                    sin.forEach(function(s, i) {
-                        if (i >= frame.hands.length) {
-                            s.pause();
-                        }
-                    });
-//                        var hand = frame.hands[0];
-//                        console.log(position);
-//                        sin.freq = position[1] * 4;
-//                        sin.freq = Math.pow(2, position[1] / 100);
-//                        console.log({position:position,freq:sin.freq});
-//                        console.log(sin.freq);
-
-//                        if (frame.valid && frame.gestures.length > 0) {
-//                            frame.gestures.forEach(function(gesture){
-//                                switch (gesture.type) {
-//                                  case "circle":
-//                                      console.log("Circle Gesture");
-//                                      if (gesture.state === 'start') {
-//                                          sin.play();
-//                                      } else if (gesture.state === 'stop') {
-//                                          sin.pause();
-//                                      }
-//                                      break;
-//                                  case "keyTap":
-//                                      console.log("Key Tap Gesture");
-//                                      break;
-//                                  case "screenTap":
-//                                      console.log("Screen Tap Gesture");
-//                                      break;
-//                                  case "swipe":
-//                                      console.log("Swipe Gesture");
-//                                      break;
-//                                }
-//                            });
-//                          }
-
-//                    } else {
-//                        sin.pause();
-//                    }
-
-//                if (frame.hands.length > 0) {
-//                    //thumb down (vertical hand) to stop
-//                    for (var i = 0; i < frame.hands.length; i++) {
-//                        var hand = frame.hands[i];
-//                        if (Math.abs(hand.palmNormal[0]) > 0.7) {
-//                            $.ajax({
-//                                type: "POST",
-//                                url: "api/player/stop",
-//                                contentType: "application/json",
-//                            });
-//                            $("#gesture").html("<i>thumb down</i>")
-//                            lastCall = new Date();
-//                        }
-//                    }
-//                }
+                frame.hands.forEach(function(hand, i) {
+                    var handPlayer = handPlayers[i];
+                    var position = hand.palmPosition;
+                    var instr = handPlayer.instruments[handPlayer.counter];
+                    instr.freq = position[1] * 4;
+                    instr.play();
+                });
+                handPlayers.forEach(function(player, i) {
+                    if (i >= frame.hands.length) {
+                        player.instruments[player.counter].pause();
+                    }
+                });
             });
     </script>
 
