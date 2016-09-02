@@ -52,6 +52,8 @@
     <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
     <script src="js/timbre.js"></script>
     <script>
+        var queue = [];
+        
         var controllerOptions = { enableGestures: true };
 
         var sin = [T("sin"), T("pulse")];
@@ -61,6 +63,25 @@
         var handPlayer1 = {counter: 0, instruments: instruments1};
         var handPlayer2 = {counter: 0, instruments: instruments2};
         var handPlayers = [handPlayer1, handPlayer2];
+        
+        // y should be within canvas height (400)
+        function draw(y){
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            // hardcoded x value
+            var x = 700;
+            //update x positions, remove if out of bounds of the canvas
+            for (i = 0; i < queue.length - 1; i++) { 
+                if (queue[i].x === 0) queue.splice(i, 1);
+                else queue[i].x--;
+            }
+            //add current position
+            queue.push({x: x, y: y});
+            // draw the queue of positions
+            queue.forEach(function(pos, i){
+                ctx.fillRect(pos.x, pos.y, 2, 2);
+            });
+        }
 
         Leap.loop(controllerOptions,
             function (frame) {
@@ -82,6 +103,9 @@
 </head>
 
 <body>
+    <canvas id="canvas" width="1200" height="400" style="border:1px solid #d3d3d3;">
+        Your browser does not support the canvas element.
+    </canvas>
     <div class="container">
         <h1>Search for tracks</h1>
         <p>Type a search query and click on "Search". Then, click on any track to play it on server....</p>
