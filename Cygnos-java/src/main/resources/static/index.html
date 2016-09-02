@@ -52,6 +52,7 @@
     <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
     <script src="js/timbre.js"></script>
     <script>
+
         var queue = [];
         
         var controllerOptions = { enableGestures: true };
@@ -66,8 +67,10 @@
         
         // y should be within canvas height (400)
         function draw(y){
+            var color = 'rgb(' + Math.floor((Math.random() * 255) + 1) + ',' + Math.floor((Math.random() * 255) + 1) + ',' + Math.floor((Math.random() * 255) + 1) + ')';
             var canvas = document.getElementById("canvas");
             var ctx = canvas.getContext("2d");
+            ctx.fillStyle = color;
             // hardcoded x value
             var x = 700;
             //update x positions, remove if out of bounds of the canvas
