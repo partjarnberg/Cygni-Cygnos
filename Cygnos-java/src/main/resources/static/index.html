@@ -54,17 +54,24 @@
     <script>
 
         var queue = [];
-        
+
+        function updateHandPlayer(handPlayer, step) {
+            handPlayer.counter += step;
+            if (handPlayer.counter >= handPlayer.instruments.length) {
+                handPlayer.counter = 0;
+            }
+            handPlayer.currentInstrument = handPlayer.instruments[handPlayer.counter];
+        }
+
         var controllerOptions = { enableGestures: true };
 
-        var sin = [T("sin"), T("pulse")];
-        var instruments1 = [T("sin"), T("pulse")];
-        var instruments2 = [T("sin"), T("pulse")];
-//        T("delay", {time: 50, fb: 1.4, mix: 0.5}, sin[0]).play();
-        var handPlayer1 = {counter: 0, instruments: instruments1};
-        var handPlayer2 = {counter: 0, instruments: instruments2};
+        var instruments1 = [T("sin"), T("pulse"), T("saw")/*, T("pink")*/];
+        var instruments2 = [T("sin"), T("pulse"), T("saw")/*, T("pink")*/];
+        var handPlayer1 = {id: -2, counter: 0, instruments: instruments1};
+        var handPlayer2 = {id: -1, counter: 0, instruments: instruments2};
+
         var handPlayers = [handPlayer1, handPlayer2];
-        
+
         // y should be within canvas height (400)
         function draw(y){
             var color = 'rgb(' + Math.floor((Math.random() * 255) + 1) + ',' + Math.floor((Math.random() * 255) + 1) + ',' + Math.floor((Math.random() * 255) + 1) + ')';
@@ -74,7 +81,7 @@
             // hardcoded x value
             var x = 700;
             //update x positions, remove if out of bounds of the canvas
-            for (i = 0; i < queue.length - 1; i++) { 
+            for (i = 0; i < queue.length - 1; i++) {
                 if (queue[i].x === 0) queue.splice(i, 1);
                 else queue[i].x--;
             }
@@ -88,11 +95,29 @@
 
         Leap.loop(controllerOptions,
             function (frame) {
+                frame.gestures.forEach(function(g, i) {
+                    if (g.type === 'keyTap') {
+                        g.handIds.forEach(function(id, i) {
+                            var id = id;
+                            handPlayers.forEach(function(handPlayer) {
+
+                            if (handPlayer.id === id) {
+                                console.log("keyTap", id);
+                                handPlayer.instruments[handPlayer.counter].pause();
+                                updateHandPlayer(handPlayer, 1);
+                            }
+                        });
+                    });
+                }
+                });
                 frame.hands.forEach(function(hand, i) {
                     var handPlayer = handPlayers[i];
+                    handPlayer.id = hand.id;
                     var position = hand.palmPosition;
                     var instr = handPlayer.instruments[handPlayer.counter];
-                    instr.freq = position[1] * 4;
+                    var y = position[1] * 3;
+                    instr.set({freq: y});
+                    draw(y/1500 * 500);
                     instr.play();
                 });
                 handPlayers.forEach(function(player, i) {
@@ -106,7 +131,7 @@
 </head>
 
 <body>
-    <canvas id="canvas" width="1200" height="400" style="border:1px solid #d3d3d3;">
+    <canvas id="canvas" width="1200" height="500">
         Your browser does not support the canvas element.
     </canvas>
     <div class="container">
