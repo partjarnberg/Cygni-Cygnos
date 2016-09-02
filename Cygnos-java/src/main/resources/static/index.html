@@ -50,6 +50,7 @@
             });
     </script>
     <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
+    <script src="js/timbre.js"></script>
     <script>
         var controllerOptions = { enableGestures: true };
         var lastCall = 0;
@@ -88,6 +89,10 @@
                             });
                             $("#gesture").html("<i>Devil horns</i>")
                             lastCall = new Date();
+                        }
+
+                        if (hand.pinky.extended && !hand.ringFinger.extended && !hand.middleFinger.extended && !hand.indexFinger.extended) {
+                            T("sin", {freq:880}).play();
                         }
                     }
                 }
